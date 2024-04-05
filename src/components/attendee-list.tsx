@@ -6,8 +6,41 @@ import {
   LucideSearch,
   MoreHorizontal,
 } from "lucide-react";
+import { IconButton } from "./icon-button";
+import { Table } from "./table/table";
+import { TableHeader } from "./table/table-header";
+import { TableCell } from "./table/table-cell";
+import { TableRow } from "./table/table-row";
+import { attendees } from "../data/attendees";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import "dayjs/locale/pt-br";
+import { useState } from "react";
+
+dayjs.extend(relativeTime);
+dayjs.locale("pt-br");
 
 export function AttendeeList() {
+  const [page, setPage] = useState(1);
+
+  const totalPages = Math.ceil(attendees.length / 10);
+
+  function goToFirstPage() {
+    setPage(1);
+  }
+
+  function goToLastPage() {
+    setPage(totalPages);
+  }
+
+  function goToPreviousPage() {
+    setPage(page - 1);
+  }
+
+  function goToNextPage() {
+    setPage(page + 1);
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-3 items-center">
@@ -23,105 +56,90 @@ export function AttendeeList() {
         </div>
       </div>
 
-      <div className="border border-white/10 rounded-lg">
-        <table className="w-full ">
-          <thead>
-            <tr className="border-b border-white/10">
-              <th
-                style={{ width: 48 }}
-                className="py-3 px-4 text-sm font-semibold text-left"
+      <Table>
+        <thead>
+          <tr className="border-b border-white/10">
+            <TableHeader style={{ width: 48 }}>
+              <input
+                type="checkbox"
+                className="size-4 bg-black/20 rounded border-white/10 checked:bg-orange-400"
+              />
+            </TableHeader>
+            <TableHeader>Códigos</TableHeader>
+            <TableHeader>Participantes</TableHeader>
+            <TableHeader>Data de Inscrição</TableHeader>
+            <TableHeader>Data do Check-in</TableHeader>
+            <TableHeader style={{ width: 64 }}></TableHeader>
+          </tr>
+        </thead>
+        <tbody>
+          {attendees.slice((page - 1) * 10, page * 10).map((attendees) => {
+            return (
+              <TableRow
+                key={attendees.id}
+                className="border-b border-white/10 hover:bg-white/5"
               >
-                <input
-                  type="checkbox"
-                  className="size-4 bg-black/20 rounded border-white/10 checked:bg-orange-400"
-                />
-              </th>
-              <th className="py-3 px-4 text-sm font-semibold text-left">
-                Códigos
-              </th>
-              <th className="py-3 px-4 text-sm font-semibold text-left">
-                Participantes
-              </th>
-              <th className="py-3 px-4 text-sm font-semibold text-left">
-                Data de Inscrição
-              </th>
-              <th className="py-3 px-4 text-sm font-semibold text-left">
-                Data do Check-in
-              </th>
-              <th
-                style={{ width: 64 }}
-                className="py-3 px-4 text-sm font-semibold text-left"
-              ></th>
-            </tr>
-          </thead>
-          <tbody>
-            {Array.from({ length: 10 }).map((_, i) => {
-              return (
-                <tr
-                  key={i}
-                  className="border-b border-white/10 hover:bg-white/5"
-                >
-                  <td className="py-3 px-4 text-sm text-zinc-300">
-                    <input
-                      type="checkbox"
-                      className="size-4 bg-black/20 rounded border-white/10 checked:bg-orange-400"
-                    />
-                  </td>
-                  <td className="py-3 px-4 text-sm text-zinc-300">12345</td>
-                  <td className="py-3 px-4 text-sm text-zinc-300">
-                    <div className="flex flex-col gap-1">
-                      <span className="font-semibold text-white">
-                        Pietro Kettner
-                      </span>
-                      <span>pietro@email.com</span>
-                    </div>
-                  </td>
-                  <td className="py-3 px-4 text-sm text-zinc-300">
-                    7 dias atrás
-                  </td>
-                  <td className="py-3 px-4 text-sm text-zinc-300">
-                    3 dias atrás
-                  </td>
-                  <td className="py-3 px-4 text-sm text-zinc-300">
-                    <button className="bg-white/10 border-white/10 rounded-md p-1.5">
-                      <MoreHorizontal className="size-4" />
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colSpan={3} className="py-3 px-4 text-sm text-zinc-300">
-                Mostrando 10 de 228 items
-              </td>
-              <td
-                colSpan={3}
-                className="py-3 px-4 text-sm text-zinc-300 text-right"
-              >
-                <div className="inline-flex items-center gap-8">
-                  <span>Pagina 1 de 23</span>
-                  <div className="flex gap-1.5">
-                    <button className="bg-white/10 border-white/10 rounded-md p-1.5">
-                      <ChevronsLeft className="size-4" />
-                    </button>
-                    <button className="bg-white/10 border-white/10 rounded-md p-1.5">
-                      <ChevronLeft className="size-4" />
-                    </button>
-                    <button className="bg-white/10 border-white/10 rounded-md p-1.5">
-                      <ChevronRight className="size-4" />
-                    </button>
-                    <button className="bg-white/10 border-white/10 rounded-md p-1.5">
-                      <ChevronsRight className="size-4" />
-                    </button>
+                <TableCell>
+                  <input
+                    type="checkbox"
+                    className="size-4 bg-black/20 rounded border-white/10 checked:bg-orange-400"
+                  />
+                </TableCell>
+                <TableCell>{attendees.id}</TableCell>
+                <TableCell>
+                  <div className="flex flex-col gap-1">
+                    <span className="font-semibold text-white">
+                      {attendees.name}
+                    </span>
+                    <span>{attendees.email}</span>
                   </div>
+                </TableCell>
+                <TableCell>{dayjs().to(attendees.createdAt)}</TableCell>
+                <TableCell>{dayjs().to(attendees.checkedInAt)}</TableCell>
+                <TableCell>
+                  <IconButton transparent>
+                    <MoreHorizontal className="size-4" />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </tbody>
+        <tfoot>
+          <tr>
+            <TableCell colSpan={3}>
+              Mostrando 10 de {attendees.length}
+            </TableCell>
+            <TableCell colSpan={3} className="text-right">
+              <div className="inline-flex items-center gap-8">
+                <span>
+                  Pagina {page} de {totalPages}
+                </span>
+                <div className="flex gap-1.5">
+                  <IconButton onClick={goToFirstPage} disabled={page === 1}>
+                    <ChevronsLeft className="size-4" />
+                  </IconButton>
+                  <IconButton onClick={goToPreviousPage} disabled={page === 1}>
+                    <ChevronLeft className="size-4" />
+                  </IconButton>
+                  <IconButton
+                    onClick={goToNextPage}
+                    disabled={page === totalPages}
+                  >
+                    <ChevronRight className="size-4" />
+                  </IconButton>
+                  <IconButton
+                    onClick={goToLastPage}
+                    disabled={page === totalPages}
+                  >
+                    <ChevronsRight className="size-4" />
+                  </IconButton>
                 </div>
-              </td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
+              </div>
+            </TableCell>
+          </tr>
+        </tfoot>
+      </Table>
     </div>
   );
 }
